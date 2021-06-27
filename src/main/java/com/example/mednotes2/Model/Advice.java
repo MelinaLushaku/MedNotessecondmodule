@@ -1,6 +1,7 @@
 package com.example.mednotes2.Model;
 
 import javax.persistence.*;
+import javax.print.Doc;
 import java.util.Date;
 
 @Entity
@@ -19,12 +20,25 @@ public class Advice {
     @Column
     private String content;
 
+    @Embedded
+    private DoctorEntity doctorEntity;
+
+
     public Advice(){}
 
-    public Advice(String title, Date addedDate, String content) {
+    public Advice(String title, Date addedDate, String content, DoctorEntity doctorEntity) {
         this.title = title;
         this.addedDate = addedDate;
         this.content = content;
+        this.doctorEntity = doctorEntity;
+    }
+
+    public DoctorEntity getDoctorEntity() {
+        return doctorEntity;
+    }
+
+    public void setDoctorEntity(DoctorEntity doctorEntity) {
+        this.doctorEntity = doctorEntity;
     }
 
     public int getAdviceId() {

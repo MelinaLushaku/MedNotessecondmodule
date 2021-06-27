@@ -36,10 +36,36 @@ public class Diagnosis {
         this.treatment = treatment;
     }
 
+    @Embedded
+    private PatientEntity patientEntity;
+
+    @Embedded
+    private DoctorEntity doctorEntity;
+
+
+
     public Diagnosis(){}
 
-    public Diagnosis(Date dateOfChange) {
+    public Diagnosis(Date dateOfChange , PatientEntity patientEntity , DoctorEntity doctorEntity) {
         this.dateOfChange = dateOfChange;
+        this.patientEntity = patientEntity;
+        this.doctorEntity =doctorEntity;
+    }
+
+    public PatientEntity getPatientEntity() {
+        return patientEntity;
+    }
+
+    public void setPatientEntity(PatientEntity patientEntity) {
+        this.patientEntity = patientEntity;
+    }
+
+    public DoctorEntity getDoctorEntity() {
+        return doctorEntity;
+    }
+
+    public void setDoctorEntity(DoctorEntity doctorEntity) {
+        this.doctorEntity = doctorEntity;
     }
 
     public int getDiagnosisId() {
