@@ -1,22 +1,32 @@
 package com.example.mednotes2.Services;
 
 import com.example.mednotes2.DAL.AdviceRepository;
-import com.example.mednotes2.Model.Advice;
-import com.example.mednotes2.Model.DoctorEntity;
-import com.example.mednotes2.Model.PatientEntity;
+import com.example.mednotes2.DAL.DiagnosisRepository;
+import com.example.mednotes2.DAL.DiseasesRepository;
+import com.example.mednotes2.DAL.TreatmentRepository;
+import com.example.mednotes2.Model.*;
 import com.example.mednotes2.OutPutAdapters.ISystemManagementServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.print.Doc;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DoctorLogicService implements  IDoctorLogicService{
 
     @Autowired
     private AdviceRepository adviceRepository;
+    @Autowired
+    private DiagnosisRepository diagnosisRepository;
+    @Autowired
+    private TreatmentRepository treatmentRepository;
+    @Autowired
+    private DiseasesRepository diseasesRepository;
     @Autowired
     private ISystemManagementServices iSystemManagementServices;
 
@@ -54,6 +64,55 @@ public class DoctorLogicService implements  IDoctorLogicService{
     public List<Advice> adviceByDocName(String name , String surname){
         List<Advice> lista = this.adviceRepository.findAdviceByDocName(name, surname);
         return lista;
+    }
+
+    @Override
+    public void addDiagnosis(int patientEntity , int doctorEntity , String treatmentName, String diseasesName, Date startDate , Date endDate ){
+        PatientEntity pa = this.iSystemManagementServices.pacientiE(patientEntity);
+        DoctorEntity doc = this.iSystemManagementServices.doctoriE(doctorEntity);
+        Date in = new Date();
+        LocalDateTime ldt = LocalDateTime.ofInstant(in.toInstant(), ZoneId.systemDefault());
+        Date out = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+        //DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        //String outWithZeroTime = formatter.format(out);
+        out.setHours(20);
+        out.setMinutes(0);
+        out.setSeconds(0);
+        Diagnosis dg = new Diagnosis(out , pa , doc);
+        this.diagnosisRepository.save(dg);
+        Diseases ds = new Diseases(diseasesName , dg);
+        this.diseasesRepository.save(ds);
+        Treatment t = new Treatment(treatmentName, dg , startDate , endDate);
+        this.treatmentRepository.save(t);
+    }
+    @Override
+    public List<Diagnosis> getDiagnosisByPatient(int patId){
+        List<Diagnosis> lista = this.diagnosisRepository.getDiagnosisByPat(patId);
+        return lista;
+    }
+
+    @Override
+    public void editTreatment(int diagnosisId , Date eD , String treatmenN){
+        Optional<Diagnosis> lista = this.diagnosisRepository.findById(diagnosisId);
+        List<Treatment> treatments = this.treatmentRepository.editTreatment(lista.get());
+       // List<Diagnosis> diagnoses = this.diagnosisRepository.getDiagnosisByPatDoc(patientId , docId);
+        if(eD == null && treatmenN != null){
+            treatments.get(0).setTreatmentName(treatmenN);
+        }else if (eD != null && treatmenN == null){
+            treatments.get(0).setEndDate(eD);
+        }else{
+            treatments.get(0).setTreatmentName(treatmenN);
+            treatments.get(0).setEndDate(eD);
+        }
+
+        Date in = new Date();
+        LocalDateTime ldt = LocalDateTime.ofInstant(in.toInstant(), ZoneId.systemDefault());
+        Date out = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+        out.setHours(20);
+        out.setMinutes(0);
+        out.setSeconds(0);
+        lista.get().setDateOfChange(out);
+        this.treatmentRepository.save(treatments.get(0));
 
     }
 }

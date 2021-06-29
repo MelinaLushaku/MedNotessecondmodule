@@ -1,6 +1,9 @@
 package com.example.mednotes2.Model;
 
+import net.minidev.json.annotate.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 public class Treatment {
@@ -12,15 +15,40 @@ public class Treatment {
     @Column
     private String treatmentName;
 
+    @Column
+    private Date startDate;
+
+    @Column
+    private Date endDate;
+
+
     @ManyToOne
     @JoinColumn(name="diagonisisId")
     private Diagnosis diagnosis;
 
     public Treatment(){}
 
-    public Treatment(String treatmentName, Diagnosis diagnosis) {
+    public Treatment(String treatmentName, Diagnosis diagnosis, Date startDate , Date endDate) {
         this.treatmentName = treatmentName;
         this.diagnosis = diagnosis;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     public int getTreatmentId() {

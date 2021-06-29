@@ -2,6 +2,7 @@ package com.example.mednotes2.Controller;
 
 import com.example.mednotes2.Helpers.DoctorResponse;
 import com.example.mednotes2.Model.Advice;
+import com.example.mednotes2.Model.Diagnosis;
 import com.example.mednotes2.Model.DoctorEntity;
 import com.example.mednotes2.Services.IDoctorLogicService;
 import com.sun.deploy.panel.AdvancedNetworkSettingsDialog;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.print.Doc;
 import javax.ws.rs.Path;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -67,5 +70,45 @@ public class DoctorLogicController {
             return new DoctorResponse.DoctorResponseBuilder<>(201).setMesazhin("List e suksseshme").setData(lista).build();
         }
         return  new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("There are no advices from this doctor").build();
+    }
+  //int patientEntity , int doctorEntity , String treatmentName, String diseasesName, Date startDate , Date endDate
+    @PostMapping("/addDiagnosis/{docId}/{patId}/{tN}/{dN}/{sD}/{eD}")
+    public DoctorResponse addDiagnosis(@PathVariable int docId , @PathVariable int patId , @PathVariable String tN , @PathVariable String dN , @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date sD , @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date eD ){
+          sD.setHours(20);
+          sD.setMinutes(0);
+          sD.setMinutes(0);
+          eD.setHours(20);
+          eD.setMinutes(0);
+          eD.setMinutes(0);
+        Date in = new Date();
+        LocalDateTime ldt = LocalDateTime.ofInstant(in.toInstant(), ZoneId.systemDefault());
+        Date out = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+        out.setHours(20);
+        out.setMinutes(0);
+        out.setSeconds(0);
+          if(eD.compareTo(sD) > 0 && sD.compareTo(out) > 0) {
+              this.iDoctorLogicService.addDiagnosis(patId, docId, tN, dN, sD, eD);
+              return new DoctorResponse.DoctorResponseBuilder<>(201).setMesazhin("Diagnosis added!").build();
+          }
+          return new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("Dates for treatment should be after one other!").build();
+    }
+
+    @GetMapping("/getDiagnosisByPat/{patId}")
+    public DoctorResponse getDiagnosisByPat(@PathVariable int patId){
+        List<Diagnosis> lista = this.iDoctorLogicService.getDiagnosisByPatient(patId);
+        if(lista.size() != 0){
+            return new DoctorResponse.DoctorResponseBuilder<>(201).setMesazhin("List e suksesshe").setData(lista).build();
+        }
+            return new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("You don't have any diagnosis!").build();
+
+    }
+    //int diagnosisId , Date eD , String treatmenN
+    @PostMapping("/editTreatment/{dID}/{eD}/{tN}")
+    public DoctorResponse editTreatmemt(@PathVariable int dID ,  @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date eD , @PathVariable String tN){
+        if(eD != null  || tN != null){
+            this.iDoctorLogicService.editTreatment(dID, eD, tN);
+            return new DoctorResponse.DoctorResponseBuilder<>(201).setMesazhin("Treatment edited successfully").build();
+        }
+        return new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("You didn't choose what to edit!").build();
     }
 }

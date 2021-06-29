@@ -1,5 +1,7 @@
 package com.example.mednotes2.Model;
 
+import net.minidev.json.annotate.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -11,6 +13,7 @@ public class Diseases {
 
     @Column
     private String diseaseName;
+
 
     @ManyToOne
     @JoinColumn(name="diagonisisId")
