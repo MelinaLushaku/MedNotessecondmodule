@@ -1,9 +1,7 @@
 package com.example.mednotes2.Controller;
 
 import com.example.mednotes2.Helpers.DoctorResponse;
-import com.example.mednotes2.Model.Advice;
-import com.example.mednotes2.Model.Diagnosis;
-import com.example.mednotes2.Model.DoctorEntity;
+import com.example.mednotes2.Model.*;
 import com.example.mednotes2.Services.IDoctorLogicService;
 import com.sun.deploy.panel.AdvancedNetworkSettingsDialog;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +24,18 @@ public class DoctorLogicController {
 
 
 
-    @PostMapping("/addAdvice/{title}/{content}/{date}/{nrPersonal}")
-    public DoctorResponse addNewAdvice(@PathVariable String title, @PathVariable String content , @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date , @PathVariable int nrPersonal){
+    @PostMapping("/addAdvice/{title}/{content}/{nrPersonal}")
+    public DoctorResponse addNewAdvice(@PathVariable String title, @PathVariable String content , @PathVariable int nrPersonal){
         DoctorEntity docE = this.iDoctorLogicService.docEnt(nrPersonal);
         List<Advice> lista = this.iDoctorLogicService.adviceExists(title);
         if(lista.size() == 0 && docE != null){
-            this.iDoctorLogicService.addNewAdvice(title, content, date, nrPersonal);
+            Date in = new Date();
+            LocalDateTime ldt = LocalDateTime.ofInstant(in.toInstant(), ZoneId.systemDefault());
+            Date out = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+            out.setHours(20);
+            out.setMinutes(0);
+            out.setSeconds(0);
+            this.iDoctorLogicService.addNewAdvice(title, content, out, nrPersonal);
             return new DoctorResponse.DoctorResponseBuilder<>(201).setMesazhin("Advice added successfully").build();
         }
         return new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("This advice already exists!").build();
@@ -110,5 +114,27 @@ public class DoctorLogicController {
             return new DoctorResponse.DoctorResponseBuilder<>(201).setMesazhin("Treatment edited successfully").build();
         }
         return new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("You didn't choose what to edit!").build();
+    }
+
+    @PostMapping("/deleteTreatment/{treatId}")
+    public DoctorResponse deleteTreatment(@PathVariable int treatId){
+        Treatment t = this.iDoctorLogicService.getTreatment(treatId);
+
+        if(t != null){
+            this.iDoctorLogicService.deleteTreatment(t);
+            return  new DoctorResponse.DoctorResponseBuilder<>(201).setMesazhin("Treatment Deleted!").build();
+        }
+        return  new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("You didn't choose a treatment").build();
+    }
+
+    @PostMapping("/deleteDiseases/{dId}")
+    public DoctorResponse deleteDisease(@PathVariable int dId){
+        Diseases t = this.iDoctorLogicService.getDiseases(dId);
+
+        if(t != null){
+            this.iDoctorLogicService.deleteDiseases(t);
+            return  new DoctorResponse.DoctorResponseBuilder<>(201).setMesazhin("Disease is  Deleted!").build();
+        }
+        return  new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("You didn't choose a treatment").build();
     }
 }

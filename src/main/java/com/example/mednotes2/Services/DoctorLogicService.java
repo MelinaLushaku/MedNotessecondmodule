@@ -115,4 +115,21 @@ public class DoctorLogicService implements  IDoctorLogicService{
         this.treatmentRepository.save(treatments.get(0));
 
     }
+
+    public Treatment getTreatment(int treatmentId){
+        Optional<Treatment> treatime = this.treatmentRepository.findById(treatmentId);
+        return treatime.get();
+    }
+
+    public void deleteTreatment(Treatment t){
+        this.treatmentRepository.delete(t);
+    }
+
+    public Diseases getDiseases(int dID){
+        Optional<Diseases> dis= this.diseasesRepository.findById(dID);
+        return dis.get();
+    }
+    public void  deleteDiseases(Diseases d){
+          this.diseasesRepository.delete(d);
+    }
 }
