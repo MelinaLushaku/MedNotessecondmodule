@@ -20,6 +20,9 @@ public interface IDoctorLogicService {
     void deleteTreatment(Treatment t);
     Diseases getDiseases(int dID);
     void  deleteDiseases(Diseases d);
+    List<Treatment> byDiagnosis(int id);
+    List<Diseases> byDiagnosisd(int id);
+
 
 
 }

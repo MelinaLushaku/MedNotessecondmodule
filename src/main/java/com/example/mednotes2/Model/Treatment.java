@@ -21,7 +21,7 @@ public class Treatment {
     @Column
     private Date endDate;
 
-
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name="diagonisisId")
     private Diagnosis diagnosis;

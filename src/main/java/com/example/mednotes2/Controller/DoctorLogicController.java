@@ -96,10 +96,11 @@ public class DoctorLogicController {
           }
           return new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("Dates for treatment should be after one other!").build();
     }
-
+// PO BOHET METODA REKURSIVE
     @GetMapping("/getDiagnosisByPat/{patId}")
     public DoctorResponse getDiagnosisByPat(@PathVariable int patId){
         List<Diagnosis> lista = this.iDoctorLogicService.getDiagnosisByPatient(patId);
+
         if(lista.size() != 0){
             return new DoctorResponse.DoctorResponseBuilder<>(201).setMesazhin("List e suksesshe").setData(lista).build();
         }

@@ -132,4 +132,20 @@ public class DoctorLogicService implements  IDoctorLogicService{
     public void  deleteDiseases(Diseases d){
           this.diseasesRepository.delete(d);
     }
+
+   @Override
+   public List<Treatment> byDiagnosis(int id){
+        Optional<Diagnosis> lista = this.diagnosisRepository.findById(id);
+        Diagnosis a = lista.get();
+        List<Treatment> lista2 = this.treatmentRepository.editTreatment(a);
+        return lista2;
+}
+   @Override
+    public List<Diseases> byDiagnosisd(int id){
+       Optional<Diagnosis> lista = this.diagnosisRepository.findById(id);
+       Diagnosis a = lista.get();
+       List<Diseases> lista2 = this.diseasesRepository.editDiseases(a);
+       return lista2;
+   }
+
 }

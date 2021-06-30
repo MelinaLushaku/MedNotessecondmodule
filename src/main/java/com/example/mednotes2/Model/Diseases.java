@@ -14,7 +14,7 @@ public class Diseases {
     @Column
     private String diseaseName;
 
-
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name="diagonisisId")
     private Diagnosis diagnosis;
