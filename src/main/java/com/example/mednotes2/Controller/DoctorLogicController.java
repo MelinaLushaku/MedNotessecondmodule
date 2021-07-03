@@ -104,7 +104,7 @@ public class DoctorLogicController {
           }
           return new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("Dates for treatment should be after one other!").build();
     }
-// PO BOHET METODA REKURSIVE
+// Lidhe me front
     @GetMapping("/getDiagnosisByPat/{patId}")
     public DoctorResponse getDiagnosisByPat(@PathVariable int patId){
 
