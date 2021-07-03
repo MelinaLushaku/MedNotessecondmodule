@@ -148,4 +148,9 @@ public class DoctorLogicService implements  IDoctorLogicService{
        return lista2;
    }
 
+   @Override
+    public  int totalAdvice(){
+        List<Advice> lista = this.adviceRepository.findAll();
+        return lista.size();
+   }
 }

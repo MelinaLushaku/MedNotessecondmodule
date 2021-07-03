@@ -22,6 +22,7 @@ public interface IDoctorLogicService {
     void  deleteDiseases(Diseases d);
     List<Treatment> byDiagnosis(int id);
     List<Diseases> byDiagnosisd(int id);
+    int totalAdvice();
 
 
 
