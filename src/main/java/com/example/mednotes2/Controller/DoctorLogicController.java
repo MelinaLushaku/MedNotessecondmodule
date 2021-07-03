@@ -4,6 +4,7 @@ import com.example.mednotes2.Helpers.DoctorResponse;
 import com.example.mednotes2.Model.*;
 import com.example.mednotes2.Services.IDoctorLogicService;
 import com.sun.deploy.panel.AdvancedNetworkSettingsDialog;
+import net.minidev.json.annotate.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -106,6 +107,7 @@ public class DoctorLogicController {
 // PO BOHET METODA REKURSIVE
     @GetMapping("/getDiagnosisByPat/{patId}")
     public DoctorResponse getDiagnosisByPat(@PathVariable int patId){
+
         List<Diagnosis> lista = this.iDoctorLogicService.getDiagnosisByPatient(patId);
 
         if(lista.size() != 0){

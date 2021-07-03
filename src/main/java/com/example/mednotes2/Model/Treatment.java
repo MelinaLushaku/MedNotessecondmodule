@@ -1,5 +1,6 @@
 package com.example.mednotes2.Model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
@@ -21,7 +22,7 @@ public class Treatment {
     @Column
     private Date endDate;
 
-    @JsonIgnore
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name="diagonisisId")
     private Diagnosis diagnosis;

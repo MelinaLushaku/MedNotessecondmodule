@@ -1,5 +1,6 @@
 package com.example.mednotes2.Model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
@@ -16,7 +17,7 @@ public class Diagnosis {
     @Column
     private Date dateOfChange;
 
-    @JsonIgnore
+    @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "diagnosis")
     private Set<Diseases> diseases;
     public Set<Diseases> getDiseases() {
@@ -26,7 +27,7 @@ public class Diagnosis {
         this.diseases = diseases;
     }
 
-    @JsonIgnore
+    @JsonManagedReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "diagnosis")
     private Set<Treatment> treatment;
     public Set<Treatment> getTreatment() {
