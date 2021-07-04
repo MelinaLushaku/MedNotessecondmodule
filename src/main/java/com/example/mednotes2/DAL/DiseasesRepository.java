@@ -11,4 +11,7 @@ import java.util.List;
 public interface DiseasesRepository extends JpaRepository<Diseases, Integer> {
     @Query("select a from Diseases a where a.diagnosis=?1")
     List<Diseases> editDiseases(Diagnosis treatmentId);
+
+    @Query("select a from Diseases a where a.diseasesId=?1 and a.diagnosis.patientEntity.personalNumber=?2")
+    Diseases deleteDiseases(int dId, int patId);
 }

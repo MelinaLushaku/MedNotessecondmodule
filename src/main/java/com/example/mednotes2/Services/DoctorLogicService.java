@@ -15,6 +15,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class DoctorLogicService implements  IDoctorLogicService{
@@ -92,9 +93,9 @@ public class DoctorLogicService implements  IDoctorLogicService{
     }
 
     @Override
-    public void editTreatment(int diagnosisId , Date eD , String treatmenN){
+    public void editTreatment(int diagnosisId , Date eD , String treatmenN , int patID){
         Optional<Diagnosis> lista = this.diagnosisRepository.findById(diagnosisId);
-        List<Treatment> treatments = this.treatmentRepository.editTreatment(lista.get());
+        List<Treatment> treatments = this.treatmentRepository.editTreatment(lista.get() , patID);
        // List<Diagnosis> diagnoses = this.diagnosisRepository.getDiagnosisByPatDoc(patientId , docId);
         if(eD == null && treatmenN != null){
             treatments.get(0).setTreatmentName(treatmenN);
@@ -116,28 +117,54 @@ public class DoctorLogicService implements  IDoctorLogicService{
 
     }
 
-    public Treatment getTreatment(int treatmentId){
-        Optional<Treatment> treatime = this.treatmentRepository.findById(treatmentId);
-        return treatime.get();
+    public Treatment getTreatment(int treatmentId , int patId){
+        Treatment treatime = this.treatmentRepository.deleteTreatment(treatmentId, patId);
+        return treatime;
     }
 
     public void deleteTreatment(Treatment t){
-        this.treatmentRepository.delete(t);
-    }
+        Diagnosis dis2 = t.getDiagnosis();
+        Date in = new Date();
+        LocalDateTime ldt = LocalDateTime.ofInstant(in.toInstant(), ZoneId.systemDefault());
+        Date out = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+        out.setHours(20);
+        out.setMinutes(0);
+        out.setSeconds(0);
+        dis2.setDateOfChange(out);
+        Set<Treatment> seti1 = dis2.getTreatment();
+        Set<Diseases> seti2 = dis2.getDiseases();
 
-    public Diseases getDiseases(int dID){
-        Optional<Diseases> dis= this.diseasesRepository.findById(dID);
-        return dis.get();
+            this.treatmentRepository.delete(t);
+
+    }
+    @Override
+    public Diseases getDiseases(int dID , int patId){
+
+        Diseases dis= this.diseasesRepository.deleteDiseases(dID , patId);
+
+        return dis;
     }
     public void  deleteDiseases(Diseases d){
-          this.diseasesRepository.delete(d);
+        Diagnosis dis2 = d.getDiagnosis();
+        Date in = new Date();
+        LocalDateTime ldt = LocalDateTime.ofInstant(in.toInstant(), ZoneId.systemDefault());
+        Date out = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+        out.setHours(20);
+        out.setMinutes(0);
+        out.setSeconds(0);
+        dis2.setDateOfChange(out);
+
+            this.diseasesRepository.delete(d);
+
+
     }
 
    @Override
    public List<Treatment> byDiagnosis(int id){
         Optional<Diagnosis> lista = this.diagnosisRepository.findById(id);
         Diagnosis a = lista.get();
-        List<Treatment> lista2 = this.treatmentRepository.editTreatment(a);
+        PatientEntity p = a.getPatientEntity();
+        List<Treatment> lista2 = this.treatmentRepository.editTreatment(a, p.getPersonalNumber());
         return lista2;
 }
    @Override
@@ -152,5 +179,16 @@ public class DoctorLogicService implements  IDoctorLogicService{
     public  int totalAdvice(){
         List<Advice> lista = this.adviceRepository.findAll();
         return lista.size();
+   }
+
+   @Override
+    public PatientEntity pat(int id){
+       PatientEntity patE = this.iSystemManagementServices.pacientiE(id);
+       return patE;
+   }
+   @Override
+    public Optional<Diagnosis> exists(int dId){
+        Optional<Diagnosis> lista = this.diagnosisRepository.findById(dId);
+        return lista;
    }
 }

@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
+import static jdk.nashorn.internal.objects.Global.print;
 
 @RestController
 @RequestMapping("/api/doctorLogicManagement")
@@ -24,7 +27,7 @@ public class DoctorLogicController {
     private IDoctorLogicService iDoctorLogicService;
 
 
-
+//done
     @PostMapping("/addAdvice/{title}/{content}/{nrPersonal}")
     public DoctorResponse addNewAdvice(@PathVariable String title, @PathVariable String content , @PathVariable int nrPersonal){
         DoctorEntity docE = this.iDoctorLogicService.docEnt(nrPersonal);
@@ -41,7 +44,7 @@ public class DoctorLogicController {
         }
         return new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("This advice already exists!").build();
     }
-
+//done
     @PostMapping("/deleteAdvice/{title}/{docId}")
     public DoctorResponse deleteAdvice(@PathVariable String title , @PathVariable int docId){
         List<Advice> lista = this.iDoctorLogicService.adviceExists(title);
@@ -58,7 +61,7 @@ public class DoctorLogicController {
         }
         return new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("This advice doesn't exists!").build();
     }
-    //lidhe front
+    //done
     @GetMapping("/allAdivce")
     public DoctorResponse getAllAdvice() {
         List<Advice> lista = this.iDoctorLogicService.allAdvices();
@@ -77,13 +80,13 @@ public class DoctorLogicController {
         return  new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("There are no advices from this doctor").build();
     }
 
-    //LIDHE ME FRONT
+    //done
     @GetMapping("/totalAdvice")
     public DoctorResponse getTotalAdivce(){
         int totalAdvice = this.iDoctorLogicService.totalAdvice();
         return new DoctorResponse.DoctorResponseBuilder<>(201).setMesazhin("Vlere e sukseshme").setData(totalAdvice).build();
     }
-
+//done
     @PostMapping("/addDiagnosis/{docId}/{patId}/{tN}/{dN}/{sD}/{eD}")
     public DoctorResponse addDiagnosis(@PathVariable int docId , @PathVariable int patId , @PathVariable String tN , @PathVariable String dN , @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date sD , @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date eD ){
           sD.setHours(20);
@@ -104,7 +107,7 @@ public class DoctorLogicController {
           }
           return new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("Dates for treatment should be after one other!").build();
     }
-// Lidhe me front
+// done
     @GetMapping("/getDiagnosisByPat/{patId}")
     public DoctorResponse getDiagnosisByPat(@PathVariable int patId){
 
@@ -116,35 +119,45 @@ public class DoctorLogicController {
             return new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("You don't have any diagnosis!").build();
 
     }
-    //lidhe front
-    @PostMapping("/editTreatment/{dID}/{eD}/{tN}")
-    public DoctorResponse editTreatmemt(@PathVariable int dID ,  @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date eD , @PathVariable String tN){
-        if(eD != null  || tN != null){
-            this.iDoctorLogicService.editTreatment(dID, eD, tN);
-            return new DoctorResponse.DoctorResponseBuilder<>(201).setMesazhin("Treatment edited successfully").build();
+    //done
+    @PostMapping("/editTreatment/{dID}/{eD}/{tN}/{patID}")
+    public DoctorResponse editTreatmemt(@PathVariable int dID ,  @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date eD , @PathVariable String tN , @PathVariable int patID){
+        if(eD != null  || tN != null) {
+            Optional<Diagnosis> d = this.iDoctorLogicService.exists(dID);
+            if (d.isPresent()) {
+                this.iDoctorLogicService.editTreatment(dID, eD, tN, patID);
+                return new DoctorResponse.DoctorResponseBuilder<>(201).setMesazhin("Treatment edited successfully").build();
+            }else{
+                return new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("The diagnose you choose doesn't exists!").build();
+
+            }
         }
         return new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("You didn't choose what to edit!").build();
     }
-    //lidhe front
-    @PostMapping("/deleteTreatment/{treatId}")
-    public DoctorResponse deleteTreatment(@PathVariable int treatId){
-        Treatment t = this.iDoctorLogicService.getTreatment(treatId);
+    //done
+    @PostMapping("/deleteTreatment/{treatId}/{patId}")
+    public DoctorResponse deleteTreatment(@PathVariable int treatId , @PathVariable int patId){
+        Treatment t = this.iDoctorLogicService.getTreatment(treatId , patId);
+            if (t != null) {
+                this.iDoctorLogicService.deleteTreatment(t);
+                return new DoctorResponse.DoctorResponseBuilder<>(201).setMesazhin("Treatment Deleted!").build();
+            }
+            return  new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("The treatment you choose doesn't belong to this patient!!!").build();
 
-        if(t != null){
-            this.iDoctorLogicService.deleteTreatment(t);
-            return  new DoctorResponse.DoctorResponseBuilder<>(201).setMesazhin("Treatment Deleted!").build();
-        }
-        return  new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("You didn't choose a treatment").build();
+        //return  new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("You didn't choose a treatment").build();
     }
-    //lidhe front
-    @PostMapping("/deleteDiseases/{dId}")
-    public DoctorResponse deleteDisease(@PathVariable int dId){
-        Diseases t = this.iDoctorLogicService.getDiseases(dId);
+    //done
+    @PostMapping("/deleteDiseases/{dId}/{patID}")
+    public DoctorResponse deleteDisease(@PathVariable int dId , @PathVariable int patID){
+        Diseases t = this.iDoctorLogicService.getDiseases(dId , patID);
+        if(t !=null) {
+                this.iDoctorLogicService.deleteDiseases(t);
+                return new DoctorResponse.DoctorResponseBuilder<>(201).setMesazhin("Disease is  Deleted!").build();
+            }
+                return new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("This disease doesnt belong to the patient you choose!!!").build();
 
-        if(t != null){
-            this.iDoctorLogicService.deleteDiseases(t);
-            return  new DoctorResponse.DoctorResponseBuilder<>(201).setMesazhin("Disease is  Deleted!").build();
         }
-        return  new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("You didn't choose a treatment").build();
-    }
+
 }
+
+
