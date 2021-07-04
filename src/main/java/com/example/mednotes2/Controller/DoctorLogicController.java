@@ -70,7 +70,7 @@ public class DoctorLogicController {
         }
         return new DoctorResponse.DoctorResponseBuilder<>(401).setErrorin("There are no Advice's").build();
     }
-    //lidhe front
+
     @GetMapping("/adviceBy/{emri}/{mbiemri}")
     public DoctorResponse getAdviceByDoc(@PathVariable String emri , @PathVariable String mbiemri){
         List<Advice> lista = this.iDoctorLogicService.adviceByDocName(emri, mbiemri);
